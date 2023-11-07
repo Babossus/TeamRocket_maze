@@ -41,8 +41,16 @@ public:
 		file.close();
 	}
 
-	
-	
+	void import_file() {
+		for (const auto & entry: filesystem::directory_iterator)
+		{
+
+		}
+	}
+	/*	Checklist
+	* rwos und cols erkennen damit startpoint erkannt wird
+	* 
+	*/
 	
 private:
 	generate maze;
