@@ -66,16 +66,14 @@ int main()
 		else if (execute == IMPORT) {
 			system("cls");
 			generate* generate_maze;
-			player* controller = new player(*generate_maze);
 			share* dateien = new share(*generate_maze);
 			dateien->import_file();
 			cout << "Was möchten Sie mit dem importiertem Labyrinth machen?\n1. Selber Spielen\n2. den Algorythmus das Labyrinth laufen lassen\n";
 			char input;
 			input = _getch();
-			switch (input)
-			{
-			case '1':
-				player * controller = new player(*generate_maze);
+
+			if (input == '1') {
+				player* controller = new player(*generate_maze);
 				generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status());
 				while (controller->manuel() == false) // dies wird ja immer ausgeführt aber durch get finish nichtmehr
 				{
@@ -85,25 +83,22 @@ int main()
 				}
 				cout << "Druecken Sie eine belibige Taste zum Fortfahren";
 				_getch();
-				break;
-			case '2':
+				delete dateien;
+				delete controller;
+			}
+			else if (input =='2') {
 				//new generate(x, y); - hier schauen weil man da nur print und start- und endpoint erstellen
-				new player(*generate_maze);
+				player* controller = new player(*generate_maze);
 				controller->automatic();
 				system("cls");
 				generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status());
 				cout << "Druecken Sie eine belibige Taste zum Fortfahren";
 				_getch();
-				break;
-			default:
-				break;
+				delete dateien;
+				delete controller;
 			}
-			if (//eingabe)
-			{
 			
-			}
-			delete dateien;
-			delete controller;
+
 			generate_maze->cleanup();
 			// mann muss endscheiden können ob man dann  selbst läuft oder einliest
 		}
