@@ -45,7 +45,7 @@ int main()
 			generate_maze->cleanup(); // muss raus aus der while schleife | nach jedem spiel einmal cleanup um speicher zu entlasten
 			delete controller;
 		}	
-		else if (execute = ALGORYTHM)
+		else if (execute == ALGORYTHM)
 		{
 			system("cls");
 			int x = input("Geben Sie die X - achse an.\n");
@@ -70,7 +70,8 @@ int main()
 			int y = input("Geben Sie die Y - achse an.\n");
 			generate* generate_maze = new generate(x, y);
 			share* dateien = new share(*generate_maze);
-			cout <<"Sie haben das Labyrinth erfolgreich Exportier\n" << "Druecken Sie eine belibige Taste zum Fortfahren"; // schauen wegen if schleife obes wirklich erfolgreich war vllt mit bool
+			dateien->export_file();
+			cout <<"Sie haben das Labyrinth erfolgreich Exportiert\n" << "Druecken Sie eine belibige Taste zum Fortfahren"; // schauen wegen if schleife obes wirklich erfolgreich war vllt mit bool
 			_getch();
 			delete dateien;
 			generate_maze->cleanup();

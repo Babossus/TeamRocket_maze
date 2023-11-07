@@ -112,26 +112,6 @@ public:
 		}
 	}
 
-	//extra für export zum ausgeben
-	void print_export() {
-
-		cout << startpoint[1] <<"," << startpoint[2] << " " << endpoint[1] << "," << endpoint[2] << endl;
-		for (int i = 0; i < col; i++)
-		{
-			for (int f = 0; f < row; f++)
-			{
-
-				if (*(maze + (f) + (i)*row) == (char)"1"){
-					cout << "1";
-				}
-				else{
-					cout << "0";
-				}
-
-			}
-			cout << endl;
-		}
-	}
 
 	// überprüft ob wegelement sich auf dem Ziel befindet
 	bool is_goal(int x, int y) {
