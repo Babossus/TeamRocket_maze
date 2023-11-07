@@ -3,6 +3,7 @@
 #include <fstream>
 #include "generate.cpp"
 #include <filesystem>
+#include <string>
 
 using std::ofstream;
 using std::cout;
@@ -11,6 +12,7 @@ using std::string;
 using std::endl;
 using std::vector;
 using std::ifstream;
+using std::stoi;
 
 class share
 {
@@ -25,7 +27,7 @@ public:
 		export_name += ".txt";
 		// Datei wird bei gleichem namen übershcrieben
 		ofstream file(export_name);
-		file << maze.startpoint[1] << "," << maze.startpoint[2] << " " << maze.endpoint[1] << "," << maze.endpoint[2] << endl;
+		file << maze.startpoint[0] << "," << maze.startpoint[1] << " " << maze.endpoint[0] << "," << maze.endpoint[1] << endl;
 		for (int i = 0; i < maze.col; i++)
 		{
 			for (int f = 0; f < maze.row; f++)
@@ -44,7 +46,7 @@ public:
 		file.close();
 	}
 
-	void import_file() {
+	void import_file(generate maze) {
 		vector<std::filesystem::directory_entry> files_found;
 		int file_choice;
 		string current_file_path;
@@ -72,6 +74,9 @@ public:
 		
 		ifstream imported_maze;
 		string content;
+		int counter = 0;
+		string maze_raw;
+
 		imported_maze.open(current_file_path);
 		if (imported_maze.fail())
 		{
@@ -81,11 +86,47 @@ public:
 		while (!imported_maze.eof()) // solange nicht am ende der datei
 		{
 			imported_maze >> content;
-			cout << content << endl;
+			if (counter == 0)
+			{
+				int pos = content.find(",");
+				maze.startpoint[0] = stoi(content.substr(0, pos));
+				maze.startpoint[1] = stoi(content.substr(pos + 1));	
+			}
+			if (counter == 1)
+			{
+				int pos = content.find(",");
+				maze.endpoint[0] = stoi(content.substr(0, pos));
+				maze.endpoint[1] = stoi(content.substr(pos + 1));
+			}
+			if (counter == 2)
+			{
+				maze.row = content.size()-1;
+			}
+			if (!counter == 0 && counter == 1 && counter == 2)
+			{
+				maze_raw += content;
+			}
+			counter++;
 		}
-		
+		maze.col = maze_raw.size()-1 / maze.row;
+		for (int i = 0; i <= maze.col; i++)
+		{
+			for (int f = 0; f <= maze.row; f++)
+			{
+				*(maze.maze + (f)+(i)*maze.row) = stoi(maze_raw.substr(f + i * maze.row, (f + i * maze.row) + 1));
+			}
+		}
 
+		for (int i = 0; i <= maze.col; i++)
+		{
+			for (int f = 0; f <= maze.row; f++)
+			{
+				cout << *(maze.maze + (f)+(i)*maze.row);
+			}
+			cout << endl;
+		}
 	}
+
 	/*	Checklist
 	* rwos und cols erkennen damit startpoint erkannt wird
 	* .txt

@@ -66,7 +66,9 @@ int main()
 		else if (execute == IMPORT) {
 			system("cls");
 			share* dateien = new share();
-			dateien->import_file();
+			generate* generate_maze = new generate(5, 5);
+			dateien->import_file(*generate_maze);
+
 			/*dateien->import_file();
 			cout << "Was möchten Sie mit dem importiertem Labyrinth machen?\n1. Selber Spielen\n2. den Algorythmus das Labyrinth laufen lassen\n";
 			char input;
