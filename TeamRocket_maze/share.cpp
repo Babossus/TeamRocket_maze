@@ -1,10 +1,14 @@
+#pragma once
 #include <iostream>
 #include <fstream>
 #include "generate.cpp"
 #include <filesystem>
 
-using namespace std;
-namespace fs = std::filesystem;
+using std::ofstream;
+using std::cout;
+using std::cin;
+using std::string;
+using std::endl;
 
 class share
 {
@@ -37,12 +41,7 @@ public:
 		file.close();
 	}
 
-	void import_file() {
-		for (const auto & entry: filesystem::directory_iterator)
-		{
-
-		}
-	}
+	
 	
 	
 private:

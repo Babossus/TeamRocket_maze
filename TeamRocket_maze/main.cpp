@@ -7,8 +7,10 @@
 #define ALGORYTHM 1
 #define IMPORT 2
 #define EXPORT 3
+
 using std::cin;
 using std::cout;
+
 
 // schonmal zeigen, dass es diese Funktionen gibt
 bool terminal(int* execute);

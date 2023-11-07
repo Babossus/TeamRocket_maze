@@ -1,8 +1,10 @@
-#pragma once
+#ifndef GENERATE_CPP
+#define GENERATE_CPP
 #include <iostream>
 #include <vector>
 #include <stack>
 #include <tuple>
+
 
 // deklaration von makros für präprozessor
 #define UP 0
@@ -10,7 +12,15 @@
 #define LEFT 2
 #define RIGHT 3
 
-using namespace std;
+using std::ofstream;
+using std::cout;
+using std::string;
+using std::endl;
+using std::pair;
+using std::make_pair;
+using std::vector;
+using std::tuple;
+using std::stack;
 
 
 class generate
@@ -23,7 +33,6 @@ public:
 	int egg_position[2];
 	int row;
 	int col;
-
 	
 	// constructor von hier aus wir alles aufgebaut
 	generate(int row, int col) :row(row), col(col) {  
@@ -462,4 +471,5 @@ private:
 	}
 
 };
+#endif
 

@@ -18,6 +18,9 @@
 #define LEFT 2
 #define RIGHT 3
 
+
+using std::pair;
+
 /*
 * start und ende erkennen durch suchen von 8 und 9 im pointer
 * 
