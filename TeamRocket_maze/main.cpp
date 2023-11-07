@@ -65,14 +65,17 @@ int main()
 		}
 		else if (execute == IMPORT) {
 			system("cls");
-			generate* generate_maze;
-			share* dateien = new share(*generate_maze);
+			share* dateien = new share();
 			dateien->import_file();
+			/*dateien->import_file();
 			cout << "Was möchten Sie mit dem importiertem Labyrinth machen?\n1. Selber Spielen\n2. den Algorythmus das Labyrinth laufen lassen\n";
 			char input;
 			input = _getch();
 
 			if (input == '1') {
+				
+
+				//nacher
 				player* controller = new player(*generate_maze);
 				generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status());
 				while (controller->manuel() == false) // dies wird ja immer ausgeführt aber durch get finish nichtmehr
@@ -101,14 +104,15 @@ int main()
 
 			generate_maze->cleanup();
 			// mann muss endscheiden können ob man dann  selbst läuft oder einliest
+			*/
 		}
 		else if (execute == EXPORT) {
 			system("cls");
 			int x = input("Geben Sie die X - achse an.\n");
 			int y = input("Geben Sie die Y - achse an.\n");
 			generate* generate_maze = new generate(x, y);
-			share* dateien = new share(*generate_maze);
-			dateien->export_file();
+			share* dateien = new share();
+			dateien->export_file(*generate_maze);
 			cout <<"Sie haben das Labyrinth erfolgreich Exportiert\n" << "Druecken Sie eine belibige Taste zum Fortfahren"; // schauen wegen if schleife obes wirklich erfolgreich war vllt mit bool
 			_getch();
 			delete dateien;
