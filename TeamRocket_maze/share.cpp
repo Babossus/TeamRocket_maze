@@ -43,7 +43,10 @@ public:
 
 		}
 	}
-	
+	/*	Checklist
+	* rwos und cols erkennen damit startpoint erkannt wird
+	* 
+	*/
 	
 private:
 	generate maze;
