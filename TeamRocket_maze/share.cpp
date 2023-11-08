@@ -89,7 +89,7 @@ public:
 			if (counter == 0)
 			{
 				int pos = content.find(",");
-				maze.startpoint[0] = stoi(content.substr(0, pos));
+				maze.startpoint[0] = stoi(content.substr(0, pos)); // stoi string to int
 				maze.startpoint[1] = stoi(content.substr(pos + 1));	
 			}
 			if (counter == 1)
@@ -102,13 +102,13 @@ public:
 			{
 				maze.row = content.size()-1;
 			}
-			if (!counter == 0 && counter == 1 && counter == 2)
+			if (counter != 0 && counter != 1 && counter != 2)
 			{
 				maze_raw += content;
 			}
 			counter++;
 		}
-		maze.col = maze_raw.size()-1 / maze.row;
+		maze.col = (maze_raw.size()-1) / maze.row;
 		for (int i = 0; i <= maze.col; i++)
 		{
 			for (int f = 0; f <= maze.row; f++)
