@@ -47,17 +47,21 @@ public:
 	}
 
 	void import_file(generate* maze) {
+		// Wir holen uns den aktuellen Pfad, von wo unser Program aufgerufen wurde. In diesem Dircectory/Ordner müssen auch unsere txt Dateien liegen.
+		path = std::filesystem::current_path().string();
 		vector<std::filesystem::directory_entry> files_found;
 		int file_choice;
 		string current_file_path;
-
+		// loopt über alle Datein in einem gegbenen ordner (nur in CPP17 verfügbar)
 		for (const auto & entry: std::filesystem::directory_iterator(path))
 		{
+			//Datei muss eine Datei sein und die endung .txt besiten.
 			if (entry.is_regular_file() && entry.path().extension() == ".txt")
 			{
 				files_found.push_back(entry);
 			}
 		}
+		// früher early return um sicherzustellen das ab jetzt nur noch mit der Bedingung gearbietet werden kann, dass es Spielfelder gibt.
 		if (files_found.empty())
 		{
 			cout << "Keine Spielfelder Gefunden\n";
@@ -78,13 +82,17 @@ public:
 		string maze_raw;
 
 		imported_maze.open(current_file_path);
+
+		// early return um sicherzustellen das ab jetzt nur noch mit der Bedingung gearbietet werden kann, dass die Datei gelsen werden kann.
 		if (imported_maze.fail())
 		{
 			cout << "Fehler, kaputte datei :)";
 			return;
 		}
-		while (!imported_maze.eof()) // solange nicht am ende der datei
+		// solange nicht am ende der datei
+		while (!imported_maze.eof())
 		{
+			// gebe aktuelle zeile aus;
 			imported_maze >> content;
 			if (counter == 0)
 			{
@@ -137,6 +145,6 @@ public:
 private:
 	string export_name;
 	string import_name;
-	const string path = "C:/Users/Matteo/source/repos/TeamRocket_maze/TeamRocket_maze/";// pfad angeben
+	string path = ""; // Hier könnte Backup Pfad stehen ...
 	 
 };

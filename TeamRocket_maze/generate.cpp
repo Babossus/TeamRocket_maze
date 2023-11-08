@@ -57,7 +57,8 @@ public:
 			path(maze, row, col, startpoint[0], startpoint[1], endpoint[0], endpoint[1]);
 			if (possible == true)
 			{
-				check_coverage(0.55); // überprüft dichte 
+				// Das hier ist optimierung, um den richtigen Wert zu finden, da wir it Zufall arbeiten. Je höher die Dichte desto unwahrscheinlicher das schnell ein Spielfeld generiert wird. Je geringer die Dichte desto langweiliger das Spielfeld, daher hat sich 0.55 als guter Wert erwiesen.
+				check_coverage(0.55); // überprüft dichte ohne rand
 			}
 			
 		}
@@ -183,15 +184,21 @@ private:
 
 	// Generierung des weges
 	void path(int* maze, int rows, int cols, int startX, int startY, int endX, int endY) {
+		// Deklariert einen Stack, jedes Element des Stacks hält dabei 4 Ints und einen eindimensionalen Vector der Integer enthält.
 		stack<tuple<int, int, int, int, vector<int>>> path_stack;
-		path_stack.push(make_tuple(startX, startY, endX, endY, vector<int>()));//
+		// Wir wollen hier keinen leeren Stack, um in die while Schleife zu kommen, daher packen wir einen Start eintrag in den Stack herein.
+		path_stack.push(make_tuple(startX, startY, endX, endY, vector<int>()));
 
+		// Hier nutzen wir das Prinzp der Rekursion nur ohne die Rekursion und deren Nachteile, da wir iterativ arbeiten.
 		while (!path_stack.empty()) {
 
 			int x, y, endX, endY;
+			// Directions speichert im verlauf der Funktion in welche Richtung unser Generator sich bewegen kann um weiter nach dem Ziel zu suchen.
 			vector<int> directions;
 
+			// Ähnlich wie bei der Rekrusion wo das nächst kleinere Problem von Paramtern dargestellt wird, verwenden wir hier tie um unsere werte mit den nächst kleineren vom Stack zu füllen.
 			tie(x, y, endX, endY, directions) = path_stack.top();
+			// Da wir die Werte jetzt haben entfernen wir den aktuellen Eintrag vom Stapel.
 			path_stack.pop();
 
 			// auf aktuelle Position "0" setzten und die Position in "breadcrums" abspeichern
@@ -250,19 +257,24 @@ private:
 					newY = y;
 					break;
 				}
+				// Da wir ja keine Rekursion verwenden, aber dessen Prinzip, übergeben wir hier das nächst kleinere Problem in Form eines Eintrags und legen es auf den Stack herauf.
 				path_stack.push(make_tuple(newX, newY, endX, endY, possible_directions));
 			}
 			else {
 				// er geht auf die koordinaten vom letztem schritt (tupel)
 				pair<int, int> previous_position_coordinates = find_previous_cell();
+				// was ist wenn wir bewegungsunfähig sind, tritt eigentlich nicht ein, aber den fall sollte man schon beachten.
 				if (previous_position_coordinates.first == -1 && previous_position_coordinates.second == -1) {
 					possible = false;
 					return;
 				}
+				// es gibt keine Richtung mehr in die wir gehen können? Dann müssen wir einen Schritt zurück, indem wir unseren ausgestreuten Brotkrumen folgen.
 				path_stack.push(make_tuple(previous_position_coordinates.first, previous_position_coordinates.second, endX, endY, vector<int>()));
 			}
 		}
 	}
+
+	// Die folgenden 4 Funktionen zeigen die Effektivität von early returns nur zu gur, alles bleibt schön übersichtlich, wir haben Gewissheit das gewissen szenarien nicht mehr eintreten können, und auch die Performance steigt an, da wir wir im zweifel weniger bedingungen prüfen müssen.
 
 	// überprüft oben (early return)
 	bool can_up(int x, int y) {
