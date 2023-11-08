@@ -67,9 +67,7 @@ int main()
 			system("cls");
 			share* dateien = new share();
 			generate* generate_maze = new generate(5, 5);
-			dateien->import_file(*generate_maze);
-
-			/*dateien->import_file();
+			dateien->import_file(generate_maze);
 			cout << "Was möchten Sie mit dem importiertem Labyrinth machen?\n1. Selber Spielen\n2. den Algorythmus das Labyrinth laufen lassen\n";
 			char input;
 			input = _getch();
@@ -106,7 +104,6 @@ int main()
 
 			generate_maze->cleanup();
 			// mann muss endscheiden können ob man dann  selbst läuft oder einliest
-			*/
 		}
 		else if (execute == EXPORT) {
 			system("cls");

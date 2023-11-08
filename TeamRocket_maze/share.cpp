@@ -46,7 +46,7 @@ public:
 		file.close();
 	}
 
-	void import_file(generate maze) {
+	void import_file(generate* maze) {
 		vector<std::filesystem::directory_entry> files_found;
 		int file_choice;
 		string current_file_path;
@@ -89,52 +89,54 @@ public:
 			if (counter == 0)
 			{
 				int pos = content.find(",");
-				maze.startpoint[0] = stoi(content.substr(0, pos));
-				maze.startpoint[1] = stoi(content.substr(pos + 1));	
+				maze->startpoint[0] = stoi(content.substr(0, pos));
+				maze->startpoint[1] = stoi(content.substr(pos + 1));	
 			}
 			if (counter == 1)
 			{
 				int pos = content.find(",");
-				maze.endpoint[0] = stoi(content.substr(0, pos));
-				maze.endpoint[1] = stoi(content.substr(pos + 1));
+				maze->endpoint[0] = stoi(content.substr(0, pos));
+				maze->endpoint[1] = stoi(content.substr(pos + 1));
 			}
 			if (counter == 2)
 			{
-				maze.row = content.size()-1;
+				maze->row = content.size();
 			}
-			if (!counter == 0 && counter == 1 && counter == 2)
+			if (counter != 0 && counter != 1)
 			{
 				maze_raw += content;
 			}
 			counter++;
 		}
-		maze.col = maze_raw.size()-1 / maze.row;
-		for (int i = 0; i <= maze.col; i++)
+		maze->col = ((maze_raw.length()) / maze->row);
+
+		// Maze muss einem neuen Speicherbereich zugewiesen werden, da sich die spiechergrösse, im Vergleich zum Konstruktor verändert hat.
+		maze->maze = /*die eingabe für maze wird in ein int* gewandelt(gecasted)*/(int*)calloc(maze->row * maze->col, sizeof(int));
+
+		// Ein wenig Ghetto, aber eine schnelle Lösung einen Char zu einem Int zu machen.
+		string str2char = "";
+
+		// Schreibe jeden Wert in das Spielfeld hinein...
+		// Ist an dieser Stelle zwar ein bisschen Ghetto, da beriets der Konstruktor, ein Maze generiert hat, aber aufrgund vón Zeitmanagement, wird die generate class so belassen wie sie ist.
+		for (int i = 0; i < maze->col; i++)
 		{
-			for (int f = 0; f <= maze.row; f++)
+			for (int f = 0; f < maze->row; f++)
 			{
-				*(maze.maze + (f)+(i)*maze.row) = stoi(maze_raw.substr(f + i * maze.row, (f + i * maze.row) + 1));
+				str2char = maze_raw[(f)+(i)*maze->row];
+				*(maze->maze + (f)+(i)*(maze->row)) = stoi(str2char);
 			}
 		}
 
-		for (int i = 0; i <= maze.col; i++)
-		{
-			for (int f = 0; f <= maze.row; f++)
-			{
-				cout << *(maze.maze + (f)+(i)*maze.row);
-			}
-			cout << endl;
-		}
+		// Setze Start und Endpunkt
+		// Da wir davon ausgehen, dass der Index hier bei 1 beginnt also unsere erste Startposition (1,1) wäre, müssen wir -1 rechnen um es an ein Array anzupassen.
+		*(maze->maze + (maze->startpoint[0]) + (maze->startpoint[1]) * (maze->row)) = 5;
+		*(maze->maze + (maze->endpoint[0]) + (maze->endpoint[1]) * (maze->row)) = 9;
+
 	}
-
-	/*	Checklist
-	* rwos und cols erkennen damit startpoint erkannt wird
-	* .txt
-	*/
 	
 private:
 	string export_name;
 	string import_name;
-	const string path = "F:/TeamRocket_maze/TeamRocket_maze/";// pfad angeben
+	const string path = "C:/Users/Matteo/source/repos/TeamRocket_maze/TeamRocket_maze/";// pfad angeben
 	 
 };
