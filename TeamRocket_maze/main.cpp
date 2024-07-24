@@ -7,8 +7,10 @@
 #define ALGORYTHM 1
 #define IMPORT 2
 #define EXPORT 3
+
 using std::cin;
 using std::cout;
+
 
 // schonmal zeigen, dass es diese Funktionen gibt
 bool terminal(int* execute);
@@ -27,15 +29,15 @@ int main()
 		if (execute == KEYBOARD)
 		{
 			system("cls");
-			int x = input("Geben Sie die X - achse an.\n");
-			int y = input("Geben Sie die Y - achse an.\n");
+			int x = input("Geben Sie die X Laenge der Achse an.\n");
+			int y = input("Geben Sie die Y Laenge der Achse an.\n");
 			generate* generate_maze = new generate(x, y);
 			player* controller = new player(*generate_maze);
-			generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status());
+			generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status(), controller->direction);
 			while (controller->manuel() == false) // dies wird ja immer ausgeführt aber durch get finish nichtmehr
 			{
 				system("cls");
-				generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status());
+				generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status(), controller->direction);
 
 			}
 			cout << "Druecken Sie eine belibige Taste zum Fortfahren";
@@ -44,43 +46,81 @@ int main()
 			finish(controller->get_egg_status());
 			generate_maze->cleanup(); // muss raus aus der while schleife | nach jedem spiel einmal cleanup um speicher zu entlasten
 			delete controller;
+			_getch();
 		}	
-		else if (execute = ALGORYTHM)
+		else if (execute == ALGORYTHM)
 		{
 			system("cls");
-			int x = input("Geben Sie die X - achse an.\n");
-			int y = input("Geben Sie die Y - achse an.\n");
+			int x = input("Geben Sie die X Laenge der Achse an.\n");
+			int y = input("Geben Sie die Y Laenge der Achse an.\n");
 			generate* generate_maze = new generate(x, y);
 			player* controller = new player(*generate_maze);
 			controller->automatic();
 			system("cls");
-			generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status());
-			cout << "Druecken Sie eine belibige Taste zum Fortfahren";
+			generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status(), controller->direction);
+			cout << "\nDruecken Sie eine belibige Taste zum Fortfahren";
 			_getch();
 			finish(controller->get_egg_status());
-			generate_maze->cleanup(); // muss raus aus der while schleife | nach jedem spiel einmal cleanup um speicher zu entlasten
+			generate_maze->cleanup();
 			delete controller;
 		}
 		else if (execute == IMPORT) {
+			system("cls");
+			share* dateien = new share();
+			generate* generate_maze = new generate(5, 5);
+			dateien->import_file(generate_maze);
+			cout << "Was möchten Sie mit dem importiertem Labyrinth machen?\n1. Selber Spielen\n2. Den Algorythmus das Labyrinth laufen lassen\n";
+			char input;
+			input = _getch();
+			system("cls");
 
+			if (input == '1') {
+				player* controller = new player(*generate_maze);
+				generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status(), controller->direction);
+				while (controller->manuel() == false) // dies wird ja immer ausgeführt aber durch get finish nichtmehr
+				{
+					system("cls");
+					generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status(), controller->direction);
+
+				}
+
+				cout << "Druecken Sie eine belibige Taste zum Fortfahren";
+				_getch();
+				finish(controller->get_egg_status());
+				delete dateien;
+				delete controller;
+				_getch();
+			}
+			else if (input =='2') {
+				//new generate(x, y); - hier schauen weil man da nur print und start- und endpoint erstellen
+				player* controller = new player(*generate_maze);
+				controller->automatic();
+				system("cls");
+				generate_maze->print_maze(controller->get_coordinates(), controller->get_move_count(), controller->get_egg_status(), controller->direction);
+				cout << "Druecken Sie eine belibige Taste zum Fortfahren";
+				_getch();
+				finish(controller->get_egg_status());
+				delete dateien;
+				delete controller;
+				_getch();
+			}
+			generate_maze->cleanup();
 		}
 		else if (execute == EXPORT) {
 			system("cls");
-			int x = input("Geben Sie die X - achse an.\n");
-			int y = input("Geben Sie die Y - achse an.\n");
+			int x = input("Geben Sie die X Länge der Achse an.\n");
+			int y = input("Geben Sie die Y Länge der Achse an.\n");
 			generate* generate_maze = new generate(x, y);
-			share* dateien = new share(*generate_maze);
-			cout <<"Sie haben das Labyrinth erfolgreich Exportier\n" << "Druecken Sie eine belibige Taste zum Fortfahren"; // schauen wegen if schleife obes wirklich erfolgreich war vllt mit bool
+			share* dateien = new share();
+			dateien->export_file(*generate_maze);
+			cout <<"Sie haben das Labyrinth erfolgreich exportiert\n" << "Druecken Sie eine belibige Taste zum Fortfahren"; 
 			_getch();
 			delete dateien;
 			generate_maze->cleanup();
 
 		}
 
-		
-		
 	}
-
 	
 }
 
@@ -90,7 +130,7 @@ bool terminal(int* execute) {
 	char input_2;
 
 	// erste Befragung
-	cout << "was moechten Sie machen?\n1.Spielen\n2.Importieren\n3.Exportieren\n4.Verlassen\n";
+	cout << "Was moechten Sie machen?\n1.Spielen\n2.Importieren\n3.Exportieren\n4.Verlassen\n";
 	input = _getch();
 	system("cls");
 
@@ -191,8 +231,6 @@ Glueckwunsch!
 /* TO DO
 * 
 * 
-* Einlesen udn Ausgabe in txt
+*
 * 
-
-
 */
