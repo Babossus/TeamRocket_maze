@@ -25,7 +25,7 @@ public:
 		cout << "geben Sie einen Dateinamen an\n";
 		cin >> export_name;
 		export_name += ".txt";
-		// Datei wird bei gleichem namen übershcrieben
+		// Datei wird bei gleichem namen ï¿½bershcrieben
 		ofstream file(export_name);
 		file << maze.startpoint[0] << "," << maze.startpoint[1] << " " << maze.endpoint[0] << "," << maze.endpoint[1] << endl;
 		for (int i = 0; i < maze.col; i++)
@@ -46,24 +46,28 @@ public:
 		file.close();
 	}
 
-	void import_file(generate maze) {
+	void import_file(generate* maze) {
+		// Wir holen uns den aktuellen Pfad, von wo unser Program aufgerufen wurde. In diesem Dircectory/Ordner mï¿½ssen auch unsere txt Dateien liegen.
+		path = std::filesystem::current_path().string();
 		vector<std::filesystem::directory_entry> files_found;
 		int file_choice;
 		string current_file_path;
-
+		// loopt ï¿½ber alle Datein in einem gegbenen ordner (nur in CPP17 verfï¿½gbar)
 		for (const auto & entry: std::filesystem::directory_iterator(path))
 		{
+			//Datei muss eine Datei sein und die endung .txt besiten.
 			if (entry.is_regular_file() && entry.path().extension() == ".txt")
 			{
 				files_found.push_back(entry);
 			}
 		}
+		// frï¿½her early return um sicherzustellen das ab jetzt nur noch mit der Bedingung gearbietet werden kann, dass es Spielfelder gibt.
 		if (files_found.empty())
 		{
 			cout << "Keine Spielfelder Gefunden\n";
 			return;
 		}
-		cout << "wählen Sie eine Datei aus:\n";
+		cout << "wï¿½hlen Sie eine Datei aus:\n";
 		for (int i = 0; i < files_found.size(); i++)
 		{
 			cout << i + 1 << ". " << files_found[i].path().filename() << endl;
@@ -78,13 +82,17 @@ public:
 		string maze_raw;
 
 		imported_maze.open(current_file_path);
+
+		// early return um sicherzustellen das ab jetzt nur noch mit der Bedingung gearbietet werden kann, dass die Datei gelsen werden kann.
 		if (imported_maze.fail())
 		{
 			cout << "Fehler, kaputte datei :)";
 			return;
 		}
-		while (!imported_maze.eof()) // solange nicht am ende der datei
+		// solange nicht am ende der datei
+		while (!imported_maze.eof())
 		{
+			// gebe aktuelle zeile aus;
 			imported_maze >> content;
 			if (counter == 0)
 			{
@@ -95,46 +103,48 @@ public:
 			if (counter == 1)
 			{
 				int pos = content.find(",");
-				maze.endpoint[0] = stoi(content.substr(0, pos));
-				maze.endpoint[1] = stoi(content.substr(pos + 1));
+				maze->endpoint[0] = stoi(content.substr(0, pos));
+				maze->endpoint[1] = stoi(content.substr(pos + 1));
 			}
 			if (counter == 2)
 			{
-				maze.row = content.size()-1;
+				maze->row = content.size();
 			}
-			if (counter != 0 && counter != 1 && counter != 2)
+			if (counter != 0 && counter != 1)
 			{
 				maze_raw += content;
 			}
 			counter++;
 		}
-		maze.col = (maze_raw.size()-1) / maze.row;
-		for (int i = 0; i <= maze.col; i++)
-		{
-			for (int f = 0; f <= maze.row; f++)
+
+		maze->col = ((maze_raw.length()) / maze->row);
+
+		// Maze muss einem neuen Speicherbereich zugewiesen werden, da sich die spiechergrï¿½sse, im Vergleich zum Konstruktor verï¿½ndert hat.
+		maze->maze = /* die eingabe fï¿½r maze wird in ein int* gewandelt(gecasted) */(int*)calloc(maze->row * maze->col, sizeof(int));
+
+		// schnelle Lï¿½sung einen Char zu einem Int zu machen.
+		string str2char = "";
+
+		// Schreibe jeden Wert in das Spielfeld hinein...
+		// an sich wird im construktor schon ein maze geneiet, wegen zeitduck ist das so aber schneller
+		for (int i = 0; i < maze->col-1; i++) {
+			for (int f = 0; f < maze->row; f++)
 			{
-				*(maze.maze + (f)+(i)*maze.row) = stoi(maze_raw.substr(f + i * maze.row, (f + i * maze.row) + 1));
+				str2char = maze_raw[(f)+(i)*maze->row];
+				*(maze->maze + (f)+(i)*(maze->row)) = stoi(str2char);
 			}
 		}
 
-		for (int i = 0; i <= maze.col; i++)
-		{
-			for (int f = 0; f <= maze.row; f++)
-			{
-				cout << *(maze.maze + (f)+(i)*maze.row);
-			}
-			cout << endl;
-		}
+		// Setze Start und Endpunkt
+		// Da wir davon ausgehen, dass der Index hier bei 1 beginnt also unsere erste Startposition (1,1) wï¿½re, mï¿½ssen wir -1 rechnen um es an ein Array anzupassen.
+		*(maze->maze + (maze->startpoint[0]) + (maze->startpoint[1]) * (maze->row)) = 5;
+		*(maze->maze + (maze->endpoint[0]) + (maze->endpoint[1]) * (maze->row)) = 9;
+
 	}
-
-	/*	Checklist
-	* rwos und cols erkennen damit startpoint erkannt wird
-	* .txt
-	*/
 	
 private:
 	string export_name;
 	string import_name;
-	const string path = "F:/TeamRocket_maze/TeamRocket_maze/";// pfad angeben
+	string path = ""; // Hier kï¿½nnte Backup Pfad stehen ...
 	 
 };

@@ -6,7 +6,7 @@
 #include <tuple>
 
 
-// deklaration von makros für präprozessor
+// deklaration von makros für präprozessor --- hier wollte ich es nicht in die Himmelsrichtungen umbenennen da der generator immer nach Norden Schaut
 #define UP 0
 #define DOWN 1
 #define LEFT 2
@@ -57,10 +57,12 @@ public:
 			path(maze, row, col, startpoint[0], startpoint[1], endpoint[0], endpoint[1]);
 			if (possible == true)
 			{
-				check_coverage(0.55); // überprüft dichte 
-			}
-			
+				// Das hier ist optimierung, um den richtigen Wert zu finden, da wir it Zufall arbeiten. Je höher die Dichte desto unwahrscheinlicher das schnell ein Spielfeld generiert wird. Je geringer die Dichte desto langweiliger das Spielfeld, daher hat sich 0.55 als guter Wert erwiesen.
+				check_coverage(0.55); // überprüft dichte ohne rand
+			}			
 		}
+		multiple_ways(row, col);
+		
 
 		*(maze + (startpoint[0]) + (startpoint[1]) *row) = 5;		
 		*(maze + (endpoint[0]) + (endpoint[1]) * row) = 9;
@@ -74,9 +76,9 @@ public:
 	
 
 	// Ausgabe von dem Spielfeld
-	void print_maze(pair<int, int> coordinates, int steps, pair<bool, bool> easter_egg) {
+	void print_maze(pair<int, int> coordinates, int steps, pair<bool, bool> easter_egg, int richtung) {
 		print_line();
-		cout << "Spielfeld:\t" << "Koordineaten: " <<"(" << coordinates.first << "," << coordinates.second << ")\t" << "Zuege: " << steps ;
+		cout << "Spielfeld:\t" << "Koordinaten: " <<"(" << coordinates.first << "," << coordinates.second << ")\t" << "Zuege: " << steps ;
 		if (easter_egg.second == true)
 		{
 			if (easter_egg.first == true)
@@ -100,17 +102,37 @@ public:
 				case 1:
 					cout << char(219) << char(219);// cooler block im unicode
 					break;
-				case 4:
+				case 3: //4
 					cout << "<>";
 					break;
 				case 5:
-					cout << ":P";
+					switch (richtung)
+					{
+					case 0:
+						cout << '/' <<'\\';
+						break;
+					case 1:
+						cout << "<-";
+						break;
+					case 2:
+						cout << '\\'<<'/';
+						break;
+					case 3:
+						cout << "->";
+						break;
+					default:
+						break;
+					}
 					break;
 				case 8:
 					cout << "SP";
 					break;
 				case 9:
 					cout << "EP";
+					break;
+					//
+				case 2:
+					cout << "HI";
 					break;
 				default:
 					cout << "  ";
@@ -166,6 +188,7 @@ private:
 	bool coverage = false;
 	bool egg = false;
 	bool goal = false;
+
 	
 	vector<pair<int, int>> breadcrums;
 
@@ -183,15 +206,21 @@ private:
 
 	// Generierung des weges
 	void path(int* maze, int rows, int cols, int startX, int startY, int endX, int endY) {
+		// Deklariert einen Stack, jedes Element des Stacks hält dabei 4 Ints und einen eindimensionalen Vector der Integer enthält.
 		stack<tuple<int, int, int, int, vector<int>>> path_stack;
-		path_stack.push(make_tuple(startX, startY, endX, endY, vector<int>()));//
+		// Wir wollen hier keinen leeren Stack, um in die while Schleife zu kommen, daher packen wir einen Start eintrag in den Stack herein.
+		path_stack.push(make_tuple(startX, startY, endX, endY, vector<int>()));
 
+		// Hier nutzen wir das Prinzp der Rekursion nur ohne die Rekursion und deren Nachteile, da wir iterativ arbeiten.
 		while (!path_stack.empty()) {
 
 			int x, y, endX, endY;
+			// Directions speichert im verlauf der Funktion in welche Richtung unser Generator sich bewegen kann um weiter nach dem Ziel zu suchen.
 			vector<int> directions;
 
+			// Ähnlich wie bei der Rekrusion wo das nächst kleinere Problem von Paramtern dargestellt wird, verwenden wir hier tie um unsere werte mit den nächst kleineren vom Stack zu füllen.
 			tie(x, y, endX, endY, directions) = path_stack.top();
+			// Da wir die Werte jetzt haben entfernen wir den aktuellen Eintrag vom Stapel.
 			path_stack.pop();
 
 			// auf aktuelle Position "0" setzten und die Position in "breadcrums" abspeichern
@@ -250,19 +279,24 @@ private:
 					newY = y;
 					break;
 				}
+				// Da wir ja keine Rekursion verwenden, aber dessen Prinzip, übergeben wir hier das nächst kleinere Problem in Form eines Eintrags und legen es auf den Stack herauf.
 				path_stack.push(make_tuple(newX, newY, endX, endY, possible_directions));
 			}
 			else {
 				// er geht auf die koordinaten vom letztem schritt (tupel)
 				pair<int, int> previous_position_coordinates = find_previous_cell();
+				// was ist wenn wir bewegungsunfähig sind, tritt eigentlich nicht ein, aber den fall sollte man schon beachten.
 				if (previous_position_coordinates.first == -1 && previous_position_coordinates.second == -1) {
 					possible = false;
 					return;
 				}
+				// es gibt keine Richtung mehr in die wir gehen können? Dann müssen wir einen Schritt zurück, indem wir unseren ausgestreuten Brotkrumen folgen.
 				path_stack.push(make_tuple(previous_position_coordinates.first, previous_position_coordinates.second, endX, endY, vector<int>()));
 			}
 		}
 	}
+
+	// Die folgenden 4 Funktionen zeigen die Effektivität von early returns nur zu gur, alles bleibt schön übersichtlich, wir haben Gewissheit das gewissen szenarien nicht mehr eintreten können, und auch die Performance steigt an, da wir wir im zweifel weniger bedingungen prüfen müssen.
 
 	// überprüft oben (early return)
 	bool can_up(int x, int y) {
@@ -469,7 +503,47 @@ private:
 		}
 		cout << print_frame << endl;
 	}
-
+	void multiple_ways(int row, int col) {
+		int border = (2 * row) + (2 * col);
+		int delete_wall_number = (int)(3 * (row * col - border) / 100);
+		int max_try = 0;
+		for (int i = 0; i < (delete_wall_number); i++) { 	
+			if (max_try >= row * col) {
+				return;
+			}
+			int right = 0;
+			int left  = 0;
+			int down  = 0;
+			int up    = 0;
+			int rnd_x = (random(2, row-2));
+			int rnd_y = (random(2, col-2));
+			if (*(maze + (rnd_x)+(rnd_y)*row) == 1) {
+				//right 
+				if (*(maze + (rnd_x + 1) + (rnd_y)*row) == 0) {
+					right++;
+				}
+				// left
+				if (*(maze + (rnd_x - 1) + (rnd_y)*row) == 0) {
+					left++;
+				}
+				// down
+				if (*(maze + (rnd_x)+(rnd_y + 1) * row) == 0) {
+					down++;
+				}
+				// up
+				if (*(maze + (rnd_x)+(rnd_y - 1) * row) == 0) {
+					up++;
+				}
+			}
+			if (right + left == 2 && up + down == 0 || right + left == 0 && up + down == 2){
+				*(maze + (rnd_x)+(rnd_y)*row) = 0; // 2 zum testen
+			}
+			else{
+				i--;
+				max_try++;
+			}
+		}
+	}
 };
 #endif
 
